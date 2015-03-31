@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wedding.seller.mapper.ShopSiteIndexMapper" >
+   <resultMap id="ShopSiteIndexMap" type="com.wedding.seller.dto.ShopSiteIndexDto" >
+        <id column="shopId" property="shopId" jdbcType="VARCHAR" />
+        <result column="shopName" property="shopName" jdbcType="VARCHAR" />
+        <result column="qq" property="qq" jdbcType="VARCHAR" />
+        <result column="score" property="score" jdbcType="INTEGER" />
+    </resultMap>
+     <select id="loadShopSite" parameterType="String" resultMap="ShopSiteIndexMap">
+         select shop.id shopId,shop.`name` shopName,shop_site.integral score,shop_site.qq qq,v_domain.domain from (select * from wd_domain domain where domain = #{domain}) as v_domain
+    left join wd_shop_site shop_site on v_domain.id = shop_site.domain_id
+    left join wd_shop shop on shop.id = shop_site.shop_id
+     </select>
+</mapper>

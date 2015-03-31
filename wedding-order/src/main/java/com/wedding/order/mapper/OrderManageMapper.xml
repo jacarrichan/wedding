@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wedding.order.mapper.OrderManageMapper" >
+	
+	 <select id="findByPage" resultType="com.wedding.order.dto.OrderManageDto">
+	 	select orders.id id,  orders.order_type orderTypeId, orders.order_no orderNo, users.real_name orderBuyerName,
+			orders.order_status orderStatus,  orders.payment_status paymentStatusId, orders.appoint_id appointId,
+			shop.name shopName, seller.name sellerName, orders.buyer_mobile_no buyerMobileNo, orders.create_time createTime,
+			orders.order_total/100 orderTotal, orders.order_is_online orderIsOnlineId 
+		from (
+			select *  from wd_orders where stat=1 
+			and create_time &gt;= #{query.createTimeRange.beginDate,jdbcType=TIMESTAMP} 
+			and create_time &lt; #{query.createTimeRange.endDate,jdbcType=TIMESTAMP} 
+		) orders
+		left join wd_users users on orders.order_buyer_id = users.id and users.stat=1 
+		left join wd_shop shop on orders.shop_id = shop.id and shop.stat=1 
+		left join wd_seller seller on orders.seller_id = seller.id and seller.stat=1
+		where 1=1 
+			<include refid="where_clause" />
+	 	limit #{page.startNum}, #{page.pageSize} 
+	 </select>
+
+    <select id="findByUserAndSeller" resultType="com.wedding.order.dto.CanWithDrawOrderDto">
+        SELECT
+        orders.id id,
+        orders.order_type orderTypeId,
+        orders.order_no orderNo,
+        orders.order_status orderStatus,
+        orders.payment_status paymentStatusId,
+        orders.appoint_id appointId,
+        shop.name shopName,
+        orders.shop_id,
+        orders.create_time createTime,
+        orders.order_total / 100 orderTotal,
+        orders.order_is_online orderIsOnlineId,
+        items.id itemId,
+        items.item_name,
+        items.item_active_title,
+        order_items.item_total,
+        items.main_pic,
+        shop.id shopId
+        FROM
+        wd_orders orders ,wd_shop shop ,wd_items items,wd_order_items order_items
+        where orders.order_buyer_id = #{userId} and orders.shop_id = shop.id
+        AND shop.stat = 1
+        AND shop.activity_type = 2
+        AND orders.id=order_items.order_id
+        AND order_items.item_id=items.id
+        where 1=1
+        <include refid="where_clause" />
+        limit #{page.startNum}, #{page.pageSize}
+    </select>
+	
+	<select id="count" resultType="java.lang.Long">
+	 	select count(orders.id) 
+	 	from (
+			select * from wd_orders where stat=1 
+			and create_time &gt;= #{query.createTimeRange.beginDate,jdbcType=TIMESTAMP} 
+			and create_time &lt; #{query.createTimeRange.endDate,jdbcType=TIMESTAMP} 
+		) orders
+		left join wd_users users on orders.order_buyer_id = users.id and users.stat=1 
+		left join wd_shop shop on orders.shop_id = shop.id and shop.stat=1 
+		left join wd_seller seller on orders.seller_id = seller.id and seller.stat=1
+		where 1=1 
+			<include refid="where_clause" />
+	 </select>
+	 
+	 <sql id="where_clause" >
+	 	<if test="query.orderNum != null" >
+			and orders.order_no=#{query.orderNum}
+		</if>
+		<if test="query.orderBuyer != null" >
+			and users.real_name like #{query.orderBuyer}
+		</if>
+		<if test="query.beginAmount != null" >
+			and orders.order_total &gt;= #{query.beginAmount}
+		</if>
+		<if test="query.endAmount != null" >
+			and orders.order_total &lt;= #{query.endAmount}
+		</if>
+		<if test="query.shopName != null" >
+			and shop.name like #{query.shopName}
+		</if>
+		<if test="query.appointId != null" >
+			and orders.appoint_id = #{query.appointId}
+		</if>
+		<if test="query.orderType != null" >
+			and orders.order_type = #{query.orderType}
+		</if>
+		<if test="query.orderPaymentStatus != null" >
+			and orders.payment_status = #{query.orderPaymentStatus}
+		</if>
+	 </sql>
+</mapper>

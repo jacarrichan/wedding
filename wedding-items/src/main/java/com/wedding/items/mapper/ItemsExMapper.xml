@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wedding.items.mapper.ItemsExMapper" >
+
+     <select id="findById" parameterType="String" resultType="com.wedding.items.pojo.search.ItemsSearch">
+	   	select items.id id, items.item_name itemName, items.item_active_title itemActiveTitle, items.item_market_price itemMarketPrice,
+	   		items.item_fact_price itemFactPrice, items.item_final_price itemFinalPrice, items.seller_id sellerId, seller.`name` sellerName, 
+	   		seller.type sellerType, items.item_type itemType, items.shop_id shopId, shop.`name` shopName, items.create_time createTime, 
+	   		items.create_person createPerson, items.last_update_time lastUpdateTime, items.last_update_person lastUpdatePerson 	 
+	   	from (
+		 	select * from wd_items where id = #{itemId} 
+		) items
+		left join wd_shop shop on items.shop_id = shop.id 
+		left join wd_seller seller on items.seller_id = seller.id 
+     </select>
+</mapper>

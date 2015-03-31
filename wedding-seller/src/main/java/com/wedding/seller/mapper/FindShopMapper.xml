@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wedding.seller.mapper.FindShopMapper" >
+<select id="findShopByUser" resultType="com.wedding.seller.dto.ShopMappersDto" parameterType="String">
+select
+	wd_shop.id as shopId,
+	wd_shop.`name` as shopName,
+	wd_shop.logo,
+	wd_seller.type,
+	wd_seller.linsence,
+	wd_seller.build_time as buildTime,
+	wd_domain.domain,
+	wd_seller.province_code as provinceCode,
+	wd_seller.city_code as cityCode,
+	wd_seller.region_code as regionCode,
+	wd_seller.address,
+	wd_shop.phone,
+	wd_shop.email
+
+
+ from wd_seller inner join wd_shop on wd_seller.id = wd_shop.seller_id left join wd_domain on wd_domain.id = wd_seller.domain_id
+ where wd_seller.id=#{userId} and (wd_seller.parent_id = '' or wd_seller.parent_id is null)
+
+</select>
+    <select id="findAddress" parameterType="String" resultType="Map">
+select `name` from wd_addresses where id = #{addId}
+    </select>
+
+
+    <select id="findBranchByParent" resultType="com.wedding.seller.dto.BranchMapperDto" parameterType="String">
+   select
+        wd_shop.id as shopId,
+        wd_shop.`name` as shopName,
+        wd_shop.logo,
+        wd_seller.type,
+        wd_seller.linsence,
+        wd_seller.build_time as buildTime,
+        wd_seller.province_code as provinceCode,
+        wd_seller.city_code as cityCode,
+        wd_seller.region_code as regionCode,
+        wd_seller.address,
+        wd_shop.phone,
+        wd_shop.email
+
+
+        from wd_seller inner join wd_shop on wd_seller.id = wd_shop.seller_id
+        where wd_seller.parent_id = #{userId}
+
+    </select>
+</mapper>

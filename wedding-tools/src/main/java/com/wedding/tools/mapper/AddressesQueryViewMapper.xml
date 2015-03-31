@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wedding.tools.mapper.AddressesQueryViewMapper" >
+
+  <select id="getAddressByIP" resultType="com.wedding.tools.pojo.AddressesView">
+      select * from wd_addresses_view where 1 = 1
+      <foreach collection="items" item="value">
+          and LOCATE(#{value},CONCAT(wd_addresses_view.proname,wd_addresses_view.cityname,wd_addresses_view.regionname))
+      </foreach>
+  </select>
+
+    <select id="getUploadAddress" resultType="String">
+
+        select address from wd_file_upload_address
+    </select>
+
+</mapper>

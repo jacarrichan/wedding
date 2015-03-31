@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wedding.order.mapper.AppointExMapper" >
+	
+	 <select id="findByPage" resultType="com.wedding.order.dto.AppointDto">
+	 	select users.real_name userName, seller.`name` sellerName, 
+	 		appoint.mobile_no mobileNo, appoint.telephone telephone, appoint.appoint_time appointTime, 
+	 		appoint.appoint_status appointStatus, appoint.memo memo, appoint.create_time createTime from (
+				select * from wd_appoint  
+				where stat=1 
+				<include refid="where_clause_1" />
+		) appoint
+		left join wd_users users on appoint.user_id = users.id and users.stat=1 
+		left join wd_seller seller on appoint.seller_id = seller.id and seller.stat=1 
+		where 1=1 
+		<include refid="where_clause_2" />
+	 	limit #{page.startNum}, #{page.pageSize} 
+	 </select>
+	
+	 <select id="count" resultType="java.lang.Long"> 	
+		select count(*) from (
+			select * from wd_appoint  
+			where stat=1 
+			<include refid="where_clause_1" />
+		) appoint
+		left join wd_users users on appoint.user_id = users.id and users.stat=1 
+		left join wd_seller seller on appoint.seller_id = seller.id and seller.stat=1 
+		where 1=1 
+		<include refid="where_clause_2" />
+	 </select>
+	 
+	 <sql id="where_clause_1" >
+	 	<if test="query.beginDate != null" >
+			and appoint_time &gt;= #{query.beginDate} 
+		</if>
+		<if test="query.endDate != null" >
+			and appoint_time &lt; #{query.endDate}
+		</if>
+		<if test="query.appointStatus != null" >
+			and appoint_status = #{query.appointStatus}
+		</if>
+	 </sql>
+	 
+	 <sql id="where_clause_2" >
+	 	<if test="query.sellerName != null" >
+			and seller.name like #{query.sellerName} 
+		</if>
+		<if test="query.userName != null" >
+			and users.real_name like #{query.userName}
+		</if>
+	 </sql>
+</mapper>

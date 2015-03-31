@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wedding.seller.mapper.SellerManageMapper" >
+	
+	 <select id="findByPage" resultType="com.wedding.seller.dto.SellerDto">
+	 	select seller.id id, seller.name name, seller.address address, seller.create_time createTime, 
+	 		seller.province_code provinceCode, seller.city_code cityCode, seller.region_code regionCode, 
+			seller.type type, seller.parent_id parentId, seller.level level, seller.domain_id domainId,
+			seller.linsence linsence, seller.build_time buildTime, domain.domain domain,
+			seller.org_code orgCode, seller.id_card_a idCardA, seller.id_card_b idCardB, seller.logo logo,
+			seller.start_time startTime, seller.end_time endTime, seller.withdraw withdraw, seller.internal_status internalStatus
+		from 
+		(
+			select * from wd_seller  
+			where stat=1 
+			<include refid="where_clause" />
+		) seller
+		left join wd_domain domain on seller.domain_id = domain.id and domain.stat=1
+		left join wd_seller own on seller.parent_id = own.id and own.stat=1
+		limit #{page.startNum}, #{page.pageSize} 
+	 </select>
+	 
+	 <select id="findBySellerId" parameterType="java.lang.String" resultType="com.wedding.seller.dto.SellerDto">
+		select seller.id id, seller.name name, seller.address address, seller.create_time createTime, 
+	 		seller.province_code provinceCode, seller.city_code cityCode, seller.region_code regionCode, 
+			seller.type type, seller.parent_id parentId, seller.level level, seller.domain_id domainId,
+			seller.linsence linsence, seller.build_time buildTime, domain.domain domain,
+			seller.org_code orgCode, seller.id_card_a idCardA, seller.id_card_b idCardB, seller.logo logo,
+			seller.start_time startTime, seller.end_time endTime, seller.withdraw withdraw, seller.internal_status internalStatus
+		from 
+		(
+			select * from wd_seller  
+			where id=#{sellerId} and stat=1 
+		) seller
+		left join wd_domain domain on seller.domain_id = domain.id and domain.stat=1
+		left join wd_seller own on seller.parent_id = own.id and own.stat=1
+	 </select>
+	
+	 <select id="count" resultType="java.lang.Long">
+	 	select count(seller.id) 
+		from 
+		(
+			select * from wd_seller  
+			where stat=1 
+			<include refid="where_clause" />
+		) seller
+		left join wd_domain domain on seller.domain_id = domain.id and domain.stat=1
+		left join wd_seller own on seller.parent_id = own.id and own.stat=1
+	 </select>
+    <select id="findParentSeller" resultType="com.wedding.seller.dto.SellerDto" parameterType="String">
+
+select id,`name`,province_code as provinceCode,city_code as cityCode,region_code as regionCode,address,create_time as createTime,type,level,linsence,build_time as buildTime,
+
+domain_id as domain,id_card_a as idCardA,id_card_b as idCardB,logo,start_time as startTime,end_time as endTime
+
+ from wd_seller where id ='0013309a-d83f-43dd-b570-b2c9b4478c90'
+
+    </select>
+
+	  <sql id="where_clause" >
+	 	<if test="query.name != null" >
+			and name like #{query.name}
+		</if>
+		<if test="query.sellerType != null" >
+			and type = #{query.sellerType}
+		</if>
+		<if test="query.internalStatus != null" >
+			and internal_status = #{query.internalStatus}
+		</if>
+		<if test="query.province != null" >
+			and province_code = #{query.province}
+		</if>
+		<if test="query.city != null" >
+			and city_code = #{query.city}
+		</if>
+		<if test="query.districts != null" >
+			and region_code = #{query.districts}
+		</if>
+		
+	 </sql>
+</mapper>

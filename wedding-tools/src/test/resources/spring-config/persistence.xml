@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+  
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<!-- Connection Info -->
+		<property name="driverClassName" value="${datasource.driverClassName}" />
+		<property name="url" value="${datasource.url}" />
+		<property name="username" value="${datasource.username}" />
+		<property name="password" value="${datasource.password}" />
+
+		<!-- Connection Pooling Info -->
+		<property name="initialSize" value="5" />
+		<property name="maxActive" value="50" />
+		<property name="maxIdle" value="30" />
+		<property name="maxWait" value="1000" />
+		<property name="poolPreparedStatements" value="true" />
+		<property name="defaultAutoCommit" value="false" />
+	</bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath*:/mapper/*Mapper.xml" />
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com/wedding/admin/manager/mapper;com/wedding/user/mapper;com/wedding/order/mapper;com/wedding/seller/mapper;com/wedding/tools/mapper" />
+    </bean>
+
+    <!-- 日志数据源 -->
+    <bean id="logDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <!-- Connection Info -->
+        <property name="driverClassName" value="${log.datasource.driverClassName}" />
+        <property name="url" value="${log.datasource.url}" />
+        <property name="username" value="${log.datasource.username}" />
+        <property name="password" value="${log.datasource.password}" />
+
+        <!-- Connection Pooling Info -->
+        <property name="initialSize" value="5" />
+        <property name="maxActive" value="50" />
+        <property name="maxIdle" value="30" />
+        <property name="maxWait" value="1000" />
+        <property name="poolPreparedStatements" value="true" />
+        <property name="defaultAutoCommit" value="false" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource">
+            <ref bean="logDataSource" />
+        </property>
+    </bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager"  />
+</beans>
+
